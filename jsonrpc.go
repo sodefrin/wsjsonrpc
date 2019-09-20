@@ -59,7 +59,7 @@ func (j *JsonRPC) Send(method string, msg interface{}, id *int) error {
 	})
 }
 
-func (j *JsonRPC) Recv() (string, interface{}, *int, error) {
+func (j *JsonRPC) Recv() (string, json.RawMessage, *int, error) {
 	msg := JsonRPCMessage{}
 	if err := j.codec.Receive(j.conn, &msg); err != nil {
 		return "", nil, nil, err
