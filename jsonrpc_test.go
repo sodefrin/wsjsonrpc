@@ -12,11 +12,11 @@ func ExampleJsonRPC() {
 		Channel string `json:"channel"`
 	}
 
+	rpc.Open()
+
 	rpc.OnRecv("channelMessage", func(msg json.RawMessage, id *int) {
 		rpc.Close()
 	})
-
-	rpc.Open()
 
 	go rpc.Recv()
 
