@@ -16,7 +16,7 @@ func ExampleJsonRPC() {
 		rpc.Close()
 	})
 
-	rpc.Run()
+	rpc.Open()
 
 	go rpc.Recv()
 

@@ -55,7 +55,7 @@ func (j *JsonRPC) OnRecv(method string, f RecvHandler) {
 	j.handler[method] = f
 }
 
-func (j *JsonRPC) Run() error {
+func (j *JsonRPC) Open() error {
 	conn, err := websocket.Dial(
 		j.url,
 		"",
@@ -65,7 +65,6 @@ func (j *JsonRPC) Run() error {
 	}
 
 	j.conn = conn
-
 	return nil
 }
 
