@@ -35,7 +35,15 @@ func NewJsonRPC(version string, url, origin string) (*JsonRPC, error) {
 		},
 	}
 
-	return &JsonRPC{version: version, url: url, origin: origin, codec: c, handler: map[string]RecvHandler{}}, nil
+	conn, err := websocket.Dial(
+		url,
+		"",
+		origin)
+	if err != nil {
+		return nil, err
+	}
+
+	return &JsonRPC{version: version, url: url, origin: origin, conn: conn, codec: c, handler: map[string]RecvHandler{}}, nil
 }
 
 func (j *JsonRPC) Send(method string, msg interface{}, id *int) error {
@@ -51,35 +59,13 @@ func (j *JsonRPC) Send(method string, msg interface{}, id *int) error {
 	})
 }
 
-func (j *JsonRPC) OnRecv(method string, f RecvHandler) {
-	j.handler[method] = f
-}
-
-func (j *JsonRPC) Open() error {
-	conn, err := websocket.Dial(
-		j.url,
-		"",
-		j.origin)
-	if err != nil {
-		return err
+func (j *JsonRPC) Recv() (string, interface{}, *int, error) {
+	msg := JsonRPCMessage{}
+	if err := j.codec.Receive(j.conn, &msg); err != nil {
+		return "", nil, nil, err
 	}
 
-	j.conn = conn
-	return nil
-}
-
-func (j *JsonRPC) Recv() error {
-	for {
-		msg := JsonRPCMessage{}
-		if err := j.codec.Receive(j.conn, &msg); err != nil {
-			return err
-		}
-
-		f, ok := j.handler[msg.Method]
-		if ok {
-			f(msg.Params, msg.ID)
-		}
-	}
+	return msg.Method, msg.Params, msg.ID, nil
 }
 
 func (j *JsonRPC) Close() error {

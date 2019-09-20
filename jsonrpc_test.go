@@ -1,7 +1,6 @@
 package wsjsonrpc
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
@@ -12,15 +11,11 @@ func ExampleJsonRPC() {
 		Channel string `json:"channel"`
 	}
 
-	rpc.Open()
-
-	rpc.OnRecv("channelMessage", func(msg json.RawMessage, id *int) {
-		rpc.Close()
-	})
-
-	go rpc.Recv()
-
 	rpc.Send("subscribe", &channel{Channel: "lightning_board_BTC_JPY"}, nil)
+
+	rpc.Recv()
+
+	rpc.Close()
 
 	fmt.Println("close")
 	// Output: close
